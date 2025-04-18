@@ -5,6 +5,6 @@ class DashbaordView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('welcome to dashboard\n'),);
+    return Center(child: Text('welcome to dashboard\n\n'),);
   }
 }
