@@ -13,6 +13,10 @@ from django.views.decorators.http import require_http_methods
 client = MongoClient("mongodb://localhost:27017")
 db = client["healthconnect"]
 doctors_collection = db["doctors"]
+patients_collection = db['patients']
+
+#test for patients database
+print(patients_collection)
 
 # Register new docotor
 @csrf_exempt
@@ -71,7 +75,7 @@ def register_view(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
-# Login doctors
+# Login doctor
 @csrf_exempt
 def login_view(request):
     # Check if the request method is POST
@@ -84,7 +88,6 @@ def login_view(request):
         # Decode the request body and parse the JSON data
         # Check if the request body is in JSON format
         data = json.loads(request.body.decode('utf-8'))
-        # Check if the required fields are present in the request body
         # Extract the required fields from the request body
         id_number = data.get('id_number')
         password = data.get('password')
@@ -106,3 +109,49 @@ def login_view(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
+# non-refer patient registration
+@csrf_exempt
+def non_refer_patient_registeration(request):
+    #check if request method is POST or not.
+    if request.method != 'POST':
+        JsonResponse({'error': 'Invalid Request Method'}, status=405)
+    try:
+        #check if the request body is in JSON format and load them into the data variable
+        data = json.loads(request.body.decode('utf-8'))
+        # Extract the required fields from the request body
+        id_number = data.get('id_number')
+        therapist_id = data.get('therapist_id_number')
+        password = data.get('password')
+        name = data.get('name')
+        age = data.get('age')
+        phone_number = data.get('phone_number')
+        gender = data.get('gender')
+
+        #check if the required fields are present in the request body
+        if not id_number or not therapist_id or not password:
+            return JsonResponse({'error': 'required fields are empty'}, status=400)
+        
+        #check if the user exists in the database or not.
+        #if it did exist then return a match error and terminate the process
+        if patients_collection.find_one({"id_number": id_number, "password": password}):
+            return JsonResponse({'status': 'unsuccessful', 'error': 'another patient with this inforamtion already exists!'}, status=401)
+        else:
+            #collecting the data and get it ready for database
+            patient_data = {
+                "id_number": id_number,
+                "therapist_id_number": therapist_id,
+                "password": password,
+                "name": name,
+                "age": age,
+                "phone_number": phone_number,
+                "gender": gender,
+            }
+            # save the patient's data in the database
+            patients_collection.insert_one(patient_data)
+            # Return a success response
+            return JsonResponse({'message': 'User registered successfully.'})
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

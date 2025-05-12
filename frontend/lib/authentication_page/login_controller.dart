@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:frontend/authentication_page/login_view.dart';
 import 'package:frontend/dashboard_page/dashbaord_view.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -18,6 +19,11 @@ class LoginController extends GetxController {
 
   void togglePasswordVisibility() {
     obSecurePassword.value = !obSecurePassword.value; // Toggle password visibility
+  }
+
+  void clearTextFields() {
+    idNumberController.clear();
+    passwordController.clear();
   }
 
 
@@ -54,7 +60,7 @@ class LoginController extends GetxController {
         
         print("Login Success: $data, ${data['doctor_name']}/n . . .");
         if (data['status'] == 'success') {
-          Get.offAll(DashbaordView());
+          Get.offAll(DashboardView());
         }
         isLoggedIn.value = true;
         print('Filling the user variables');
@@ -90,6 +96,9 @@ class LoginController extends GetxController {
   // Logout
   void logout() async {
     doctorId.value = '';
+    idNumberController.clear();
+    passwordController.clear();
     isLoggedIn.value = false;
+    Get.to(LoginView());
   }
 }

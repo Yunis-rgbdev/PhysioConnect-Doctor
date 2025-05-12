@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/authentication_page/login_view.dart';
+import 'package:frontend/authentication_page/nonrefer_register_view.dart';
 import 'package:frontend/authentication_page/register_view.dart';
+import 'package:frontend/welcome_page/welcome_view.dart';
 import 'package:get/get.dart';
 
 void main() {
@@ -80,8 +82,10 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginView(),
-        '/signup': (context) => RegisterView(),
+        '/': (context) => WelcomeView(),
+        '/login': (context) => LoginView(),
+        '/register': (context) => RegisterView(),
+        '/nonreferregister': (context) => NoneReferPatientSignup(),
       },
       // home: WelcomeScreen(),
     );

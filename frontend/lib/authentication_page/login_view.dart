@@ -68,13 +68,39 @@ class WavePatternPainter extends CustomPainter {
 
 
 class LoginView extends StatelessWidget {
-  final LoginController controller = Get.put(LoginController());
+  
   
   LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    if (screenWidth <= 720) {
+      return smallScreenLayout();
+    } else {
+      return LargeScreenLayout();
+    }
+  }
+}
+
+
+
+class smallScreenLayout extends StatelessWidget {
+  final LoginController controller = Get.put(LoginController());
+  smallScreenLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Get.back(),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           // Background wave pattern
@@ -175,120 +201,138 @@ class LoginView extends StatelessWidget {
         ],
       ),
     );
-    // return Scaffold(
-    //   backgroundColor: Colors.white,
-    //   body: Directionality(
-    //     textDirection: TextDirection.rtl,
-    //     child: Column(
-    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //       children: [
-    //         SizedBox(height: 150), // Add white space at the top
-    //         Expanded(
-    //           child: Align(
-    //             alignment: Alignment.bottomCenter,
-    //             child: Padding(
-    //               padding: const EdgeInsets.symmetric(horizontal: 0.0),
-    //               child: Container(
-    //                 padding: EdgeInsets.symmetric(vertical: 32, horizontal: 12),
-    //                 decoration: BoxDecoration(
-    //                   color: Colors.blue[200],
-    //                   borderRadius: BorderRadius.only(
-    //                     topLeft: Radius.circular(32.0),
-    //                     topRight: Radius.circular(32.0),
-    //                   ),
-    //                 ),
-    //                 height: MediaQuery.of(context).size.height ,
-    //                 width: MediaQuery.of(context).size.width,
-    //                 child: Column(
-    //                   mainAxisAlignment: MainAxisAlignment.start,
-    //                   children: [
-    //                     SizedBox(
-    //                       width: 300,
-    //                       height: 500,
-    //                       child: Column(
-    //                         children: [
-    //                           Align(
-    //                             alignment: Alignment.centerRight,
-    //                             child: Text('ID'),
-    //                           ),
-    //                           SizedBox(
-    //                             height: 60,
-    //                             child: TextField(
-    //                               controller: controller.idController,
-    //                               decoration: InputDecoration(
-    //                                 hintText: 'Enter your ID',
-    //                                 filled: true,
-    //                                 fillColor: Colors.white,
-    //                                 hintStyle: TextStyle(color: Colors.black54),
-    //                                 disabledBorder: OutlineInputBorder(
-    //                                     borderSide: BorderSide(color: Colors.black)),
-    //                                 enabledBorder: OutlineInputBorder(
-    //                                     borderSide: BorderSide(color: Colors.black)),
-    //                                 focusedBorder: OutlineInputBorder(
-    //                                     borderSide: BorderSide(color: Colors.black)),
-    //                                 border: OutlineInputBorder(
-    //                                     borderSide: BorderSide(color: Colors.black)),
-    //                               ),
-    //                             ),
-    //                           ),
-    //                           SizedBox(height: 10),
-    //                           Align(
-    //                             alignment: Alignment.centerRight,
-    //                             child: Text('Password'),
-    //                           ),
-    //                           SizedBox(
-    //                             height: 60,
-    //                             child: TextField(
-    //                               controller: controller.passwordController,
-    //                               decoration: InputDecoration(
-    //                                 filled: true,
-    //                                 fillColor: Colors.white,
-    //                                 hintText: 'Enter your password',
-    //                                 hintStyle: TextStyle(color: Colors.black54),
-    //                                 disabledBorder: OutlineInputBorder(
-    //                                     borderSide: BorderSide(color: Colors.black)),
-    //                                 enabledBorder: OutlineInputBorder(
-    //                                     borderSide: BorderSide(color: Colors.black)),
-    //                                 focusedBorder: OutlineInputBorder(
-    //                                     borderSide: BorderSide(color: Colors.black)),
-    //                                 border: OutlineInputBorder(
-    //                                     borderSide: BorderSide(color: Colors.black)),
-    //                               ),
-    //                             ),
-    //                           ),
-    //                           SizedBox(height: 25),
-    //                           ElevatedButton(
-    //                               onPressed: () => controller.sendLogin(),
-    //                               style: ElevatedButton.styleFrom(
-    //                                   backgroundColor: Colors.white,
-    //                                   shape: RoundedRectangleBorder(
-    //                                     borderRadius: BorderRadius.circular(8.0),
-    //                                   ),
-    //                                   fixedSize: Size(300, 50),
-    //                                   elevation: 6
-    //                                   ),
-                                      
-    //                               child: Text(
-    //                                 'Login',
-    //                                 style: TextStyle(fontSize: 18, color: Colors.black),
-    //                               )),
-    //                         ],
-    //                       ),
-    //                     ),
-    //                     SizedBox(height: 20), // Add some space from the bottom
-    //                   ],
-    //                 ),
-    //               ),
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }
 
+class LargeScreenLayout extends StatelessWidget {
+  final LoginController controller = Get.put(LoginController());
+  LargeScreenLayout({super.key});
 
-
-// commit 2
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Row(
+        children: [
+          Expanded(flex: 2.toInt(),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 36, horizontal: 36),
+            decoration: BoxDecoration(
+            color: Colors.blue[600],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black,
+                offset: Offset(5, 5), // Adjust this for shadow positioning
+                blurRadius: 4.0,
+                spreadRadius: 1.0,
+                ),
+              ],
+            ),
+            child: Align(
+              alignment: Alignment.topLeft,
+               child: Text(
+                'PhysioConnect',
+                 style: TextStyle(
+                  color: Colors.white,
+                   fontWeight: FontWeight.bold,
+                   fontSize: 18
+                   ),
+                ),
+              ),
+          ),
+          ),
+          Expanded(flex: 3.toInt(),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 76, horizontal: 200),
+            decoration: BoxDecoration(
+              color: Colors.white,
+            ),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('Login', style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(height: 40,),
+                Align(
+                  alignment: Alignment.center,
+                  child:SizedBox(
+                    width: 450,
+                    child: TextField(
+                    controller: controller.idNumberController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue)
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue)
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue)
+                      ),
+                      hintText: 'ID',
+                      hintStyle: const TextStyle(color: Colors.black45),
+                        prefixIcon: const Icon(Icons.perm_identity, color: Colors.blue),
+                      suffixIcon: Obx(() => controller.doctorId.value.isNotEmpty
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : const SizedBox()),
+                    ),
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(color: Colors.black),
+                    ),
+                 ),
+                ),
+                SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.center,
+                  child:SizedBox(
+                    width: 450,
+                    child: TextField(
+                    controller: controller.passwordController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue)
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue)
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue)
+                      ),
+                      hintText: 'Password',
+                      hintStyle: const TextStyle(color: Colors.black45),
+                        prefixIcon: const Icon(Icons.key, color: Colors.blue),
+                      suffixIcon: Obx(() => controller.doctorId.value.isNotEmpty
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : const SizedBox()),
+                    ),
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(color: Colors.black),
+                    ),
+                 ),
+                ),
+                SizedBox(height: 35),
+                Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: 250,
+                    child: ElevatedButton(onPressed: (){}, child: Text('Submit'), style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[600]),),
+                  ),
+                )
+              ],
+            ),
+          ),
+          ),
+          
+        ],
+      ),
+    );
+  }
+}
