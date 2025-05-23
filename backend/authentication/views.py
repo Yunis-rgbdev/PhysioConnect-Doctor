@@ -156,4 +156,4 @@ def non_refer_patient_registeration(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
-    #
+    # on brabch main
