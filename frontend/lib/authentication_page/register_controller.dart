@@ -105,7 +105,7 @@ class RegisterController extends GetxController {
 
   Future<void> sendAuth() async {
     final url = Uri.parse(
-        'http://127.0.0.1:8000/api/register/'); // Ensure trailing slash
+        'http://127.0.0.1:9000/api/register/'); // Ensure trailing slash
 
     print(phoneNumberController.text);
     if (passwordController.text != confirmPasswordController.text) {

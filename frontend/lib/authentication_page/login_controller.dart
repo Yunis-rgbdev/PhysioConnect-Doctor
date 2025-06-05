@@ -28,7 +28,7 @@ class LoginController extends GetxController {
 
 
   Future<void> login() async {
-    final url = Uri.parse('http://127.0.0.1:8000/api/login/');
+    final url = Uri.parse('http://127.0.0.1:9000/api/login/');
     isLoading.value = true; // set Loading state to true
     isError.value = false; // set Error state to false
     errorMessage.value = ''; // set Error message to empty string
