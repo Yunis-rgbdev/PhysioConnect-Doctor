@@ -155,3 +155,5 @@ def non_refer_patient_registeration(request):
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+    #
