@@ -6,6 +6,9 @@ from .mongo_client import PatientCollection
 from .mongo_client import DoctorCollection
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.utils.decorators import method_decorator
+from rest_framework.views import APIView
+from datetime import datetime
 # Create your views here.
 
 client = MongoClient("mongodb://localhost:27017")
@@ -59,4 +62,36 @@ def activating_patient(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdatePatientStatusView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        client = MongoClient("mongodb://localhost:27017")
+        db = client["healthconnect"]
+        patients_collection = db["patients"]
+
+        patient_id = data.get("id_number")
+        new_status = data.get("status")
+
+        found_patient = patients_collection.find_one({"id_number": patient_id})
+
+        result = None
+        if found_patient:
+            result = patients_collection.find_one_and_update(
+                {"id_number": patient_id},
+                {"$set": {"status": new_status, "updated_at": datetime.utcnow()}},
+                return_document=True
+            )
+
+        if result:
+            return JsonResponse({
+                "message": "Status updated successfully",
+                "new_status": result.get("status"),
+                "updated_at": result.get("updated_at").isoformat() if result.get("updated_at") else None
+            })
+        else:
+            return JsonResponse({"error": "Update failed"}, status=500)
+
 

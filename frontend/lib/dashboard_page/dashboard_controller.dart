@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://127.0.0.1:8000/data';
+  final String baseUrl = 'http://127.0.0.1:9000/data';
   final TextEditingController idController = TextEditingController();
 
   RxBool isLoading = false.obs;
@@ -31,7 +31,7 @@ class DashboardController extends GetxController {
   var patientID = <String>[].obs;
   var patientToggleActivate = 1.obs;
   var patientToggleDiscard = 0.obs;
-  var patientActivation = <String>[].obs;
+  var patientStatus = <String>[].obs;
   var isLoading = true.obs;
 
   @override
@@ -55,9 +55,9 @@ class DashboardController extends GetxController {
           .map(
               (patient) => patient['id_number'] as String? ?? 'No ID Available')
           .toList();
-      patientActivation.value = patientsJson
+      patientStatus.value = patientsJson
           .map((patient) =>
-              patient['isActive']?.toString() ?? 'isActive not true nor false')
+              patient['status']?.toString() ?? 'isActive not true nor false')
           .toList();
 
       print('Successfully loaded ${patientNames.length} patient names');

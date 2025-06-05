@@ -98,7 +98,7 @@ class NonreferRegisterController extends GetxController{
   }
 
   Future<void> non_refer_patients_register() async {
-    final non_refer_register_url = Uri.parse('http://127.0.0.1:8000/api/non_refer_register/');
+    final non_refer_register_url = Uri.parse('http://127.0.0.1:9000/api/non_refer_register/');
 
     print('registering user with ID: $idController and Therapist ID: $therapistidController');
     isLoading.value = true;

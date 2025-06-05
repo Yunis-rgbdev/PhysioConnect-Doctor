@@ -74,12 +74,12 @@ class DashboardView extends StatelessWidget {
                       final patientID =
                         controller.patientID[index].toString();
                       bool isDisabled = controller
-                          .patientActivation[index]
+                          .patientStatus[index]
                           .toString()
                           .toLowerCase() ==
-                        'false';
+                        'pending';
                       bool isActive = controller
-                          .patientActivation[index]
+                          .patientStatus[index]
                           .toLowerCase() ==
                         'true';
 
@@ -106,7 +106,7 @@ class DashboardView extends StatelessWidget {
                                 ? null
                                 : () async {
                                   final url = Uri.parse(
-                                  'http://127.0.0.1:8000/data/active/');
+                                  'http://127.0.0.1:9000/data/active/');
                                   try {
                                   print(patientID.trim());
                                   print(isDisabled);
@@ -192,7 +192,7 @@ class DashboardView extends StatelessWidget {
                                 ? null
                                 : () async {
                                   final url = Uri.parse(
-                                  'http://127.0.0.1:8000/data/active/');
+                                  'http://127.0.0.1:9000/data/accept/');
                                   try {
                                   print(patientID.trim());
                                   print(isActive);
@@ -210,7 +210,7 @@ class DashboardView extends StatelessWidget {
                                     "id_number":
                                       patientID
                                         .trim(),
-                                    "isActive": 1,
+                                    "status": "active",
                                     }),
                                   );
 
