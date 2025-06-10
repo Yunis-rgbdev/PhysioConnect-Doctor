@@ -19,8 +19,8 @@ class RegisterController extends GetxController {
   var isError = false.obs; // Error state
   var errorMessage = ''.obs; // Error message
   var isRegistered = false.obs; // Registration state
-  var isPasswordVisible = false.obs; // Password visibility state
-  var isConfirmPasswordVisible = false.obs; // Confirm password visibility state
+  var isPasswordVisible = true.obs; // Password visibility state
+  var isConfirmPasswordVisible = true.obs; // Confirm password visibility state
 
   @override
   void onInit() {

@@ -2,73 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:frontend/authentication_page/nonrefer_register_controller.dart';
 import 'package:get/get.dart';
 
-class WavePatternPainter extends CustomPainter {
+class NonReferRegisterView extends StatelessWidget {
+  final NonReferRegisterController controllerA = Get.put(NonReferRegisterController());
+
+  NonReferRegisterView({super.key});
+
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..style = PaintingStyle.fill;
-
-    // Draw wave pattern
-    final path1 = Path();
-    path1.moveTo(0, size.height * 0.65);
-    path1.quadraticBezierTo(
-      size.width * 0.25,
-      size.height * 0.7,
-      size.width * 0.5,
-      size.height * 0.65,
-    );
-    path1.quadraticBezierTo(
-      size.width * 0.75,
-      size.height * 0.6,
-      size.width,
-      size.height * 0.65,
-    );
-    path1.lineTo(size.width, size.height);
-    path1.lineTo(0, size.height);
-    path1.close();
-    canvas.drawPath(path1, paint);
-
-    // Draw circles
-    final circlePaint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..style = PaintingStyle.fill;
-
-    // Draw various sized circles for the bubble effect
-    canvas.drawCircle(
-      Offset(size.width * 0.15, size.height * 0.2),
-      size.width * 0.08,
-      circlePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.4, size.height * 0.3),
-      size.width * 0.05,
-      circlePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.75, size.height * 0.15),
-      size.width * 0.1,
-      circlePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.8, size.height * 0.4),
-      size.width * 0.06,
-      circlePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.2, size.height * 0.5),
-      size.width * 0.04,
-      circlePaint,
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth <= 900) {
+          return SmallScreenNonReferRegister();
+        } else {
+          return LargeScreenRegister();
+        }
+      },
     );
   }
+}
+
+class LargeScreenRegister extends StatelessWidget {
+  final NonReferRegisterController _controllerR = Get.find<NonReferRegisterController>();
+  LargeScreenRegister({super.key});
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }
+
+
+class SmallScreenNonReferRegister extends StatelessWidget {
+  final NonReferRegisterController _controllerR = Get.find<NonReferRegisterController>();
+  SmallScreenNonReferRegister({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
 
 class NoneReferPatientSignup extends StatelessWidget {
   NoneReferPatientSignup({super.key});
-  final NonreferRegisterController controllerN = Get.put(NonreferRegisterController());
+  final NonReferRegisterController controllerN = Get.put(NonReferRegisterController());
 
   @override
   Widget build(BuildContext context) {
@@ -76,29 +53,29 @@ class NoneReferPatientSignup extends StatelessWidget {
     if (screenWidth < 720)
       {
         return Scaffold(
-          body: Container(child: Stack(
-        children: [
-          // Background wave pattern
-          Positioned.fill(
-            child: CustomPaint(
-              painter: WavePatternPainter(),
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
-                          onPressed: () => Get.back(),
-                        ),
-                      ],
-                    ),
+          body: Stack(
+            children: [
+              // Background wave pattern
+              Positioned.fill(
+                child: CustomPaint(
+                  
+                ),
+              ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Get.back(),
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 32),
                     Text(
                       'Create\nAccount',
@@ -113,7 +90,6 @@ class NoneReferPatientSignup extends StatelessWidget {
                         hintText: 'Name',
                         fillColor: Colors.white,
                         filled: true,
-                        
                         prefixIcon: Icon(Icons.person_outline, color: Colors.blue),
                       ),
                     ),
@@ -162,9 +138,9 @@ class NoneReferPatientSignup extends StatelessWidget {
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(
-                      
+
                       hintText: 'Gender',
-                      
+
                       prefixIcon: Icon(Icons.people_outline, color: Colors.blue),
                       ),
                       items: ['Male', 'Female']
@@ -175,7 +151,7 @@ class NoneReferPatientSignup extends StatelessWidget {
                         .toList(),
                       onChanged: (value) {
                       controllerN.genderController.text = value ?? '';
-                      
+
                       },
                     ),
                     const SizedBox(height: 16),
@@ -188,8 +164,8 @@ class NoneReferPatientSignup extends StatelessWidget {
                         prefixIcon: const Icon(Icons.lock_outline, color: Colors.blue),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            controllerN.obsecurePassword.value 
-                                ? Icons.visibility_off 
+                            controllerN.obsecurePassword.value
+                                ? Icons.visibility_off
                                 : Icons.visibility,
                             color: Colors.grey,
                           ),
@@ -208,8 +184,8 @@ class NoneReferPatientSignup extends StatelessWidget {
                         prefixIcon: const Icon(Icons.lock_outline, color: Colors.blue),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            controllerN.isConfirmPasswordVisible.value 
-                                ? Icons.visibility_off 
+                            controllerN.isConfirmPasswordVisible.value
+                                ? Icons.visibility_off
                                 : Icons.visibility,
                             color: Colors.grey,
                           ),
@@ -251,8 +227,8 @@ class NoneReferPatientSignup extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),),
+                  ],
+                ),
         );
       } else {
         return Scaffold(

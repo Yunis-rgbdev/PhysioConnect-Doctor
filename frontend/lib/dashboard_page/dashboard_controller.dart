@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:frontend/user_auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,6 +27,7 @@ class ApiService {
 
 class DashboardController extends GetxController {
   final ApiService _apiService = ApiService();
+  final AuthController _controllerA = Get.find<AuthController>();
 
   var patientNames = <String>[].obs;
   var patientID = <String>[].obs;
@@ -69,6 +71,43 @@ class DashboardController extends GetxController {
     update();
   }
 
+  Future<void> acceptPatient(String status, String patientId) async {
+
+    final url = Uri.parse("http://127.0.0.1:9000/data/accept/");
+
+    isLoading.value = true;
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: jsonEncode({
+          "id_number": patientId,
+          "status": status,
+        }),
+      );
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      print("${_controllerA.docId}, ${_controllerA.docName}");
+
+      isLoading.value = false;
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+          print('Patient status updated to $status');
+        } else {
+          print("Failed: ${response.statusCode}");
+        }
+      } catch (e) {
+        isLoading.value = false;
+        print("Exception: $e");
+      }
+    }
+  }
+
   // Future<void> postActivationtoggle(String id) async {
 
   //   try {
@@ -87,7 +126,7 @@ class DashboardController extends GetxController {
   //     print('Exception: $e');
   //   }
   // }
-}
+
 
 
 

@@ -2,14 +2,16 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:frontend/authentication_page/login_view.dart';
 import 'package:frontend/dashboard_page/dashbaord_view.dart';
+import 'package:frontend/user_auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class LoginController extends GetxController {
   // Defining the text controller id number and password
+  final AuthController _controllerA = Get.find<AuthController>();
   final TextEditingController idNumberController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final obSecurePassword = true.obs; // Obscure password
+  final obSecurePassword = false.obs; // Obscure password
   final isLoading = false.obs; // Loading state
   final isError = false.obs; // Error state
   final errorMessage = ''.obs; // Error message
@@ -56,9 +58,21 @@ class LoginController extends GetxController {
       );
       isLoading.value = false;
       if (response.statusCode == 200) {
+        print("Login Success, Trying to Initialize Doctors data...");
         final data = jsonDecode(response.body);
-        
-        print("Login Success: $data, ${data['doctor_name']}/n . . .");
+        print(data);
+        // String reced_doc_id = data.get("id_number");
+        // String reced_doc_name = data.get("name");
+        // if (reced_doc_id.isNotEmpty) {
+        //   _controllerA.setDoctorId(reced_doc_id, reced_doc_name);
+        //   } else {
+            
+        //     return print("Could not initialize Doctors information from server, Terminating the process.");
+        //   }
+        // print("Doctors data initialization was successful: $data, ${data['doctor_name']}/n . . .");
+
+        _controllerA.setDoctorId(idNumberController.text.trim());
+
         if (data['status'] == 'success') {
           Get.offAll(DashboardView());
         }

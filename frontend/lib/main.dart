@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:frontend/authentication_page/login_view.dart';
 import 'package:frontend/authentication_page/nonrefer_register_view.dart';
 import 'package:frontend/authentication_page/register_view.dart';
+import 'package:frontend/user_auth_controller.dart';
 import 'package:frontend/welcome_page/welcome_view.dart';
 import 'package:get/get.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Get.put(AuthController(), permanent: true);
   runApp(const MyApp());
 }
 

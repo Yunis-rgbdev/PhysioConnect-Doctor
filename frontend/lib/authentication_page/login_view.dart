@@ -2,199 +2,221 @@ import 'package:flutter/material.dart';
 import 'package:frontend/authentication_page/login_controller.dart';
 import 'package:get/get.dart';
 
-class WavePatternPainter extends CustomPainter {
+// --- Animated Gradient Background ---
+class AnimatedGradientBackground extends StatefulWidget {
+  const AnimatedGradientBackground({super.key});
+
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..style = PaintingStyle.fill;
+  State<AnimatedGradientBackground> createState() => _AnimatedGradientBackgroundState();
+}
 
-    // Draw wave pattern
-    final path1 = Path();
-    path1.moveTo(0, size.height * 0.65);
-    path1.quadraticBezierTo(
-      size.width * 0.25,
-      size.height * 0.7,
-      size.width * 0.5,
-      size.height * 0.65,
-    );
-    path1.quadraticBezierTo(
-      size.width * 0.75,
-      size.height * 0.6,
-      size.width,
-      size.height * 0.65,
-    );
-    path1.lineTo(size.width, size.height);
-    path1.lineTo(0, size.height);
-    path1.close();
-    canvas.drawPath(path1, paint);
+class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
-    // Draw circles
-    final circlePaint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..style = PaintingStyle.fill;
+  static const List<Color> gradientColors1 = [
+    Color(0xFF6750A4),
+    Color(0xFFB69DF8),
+    Color(0xFF9A82DB),
+  ];
+  static const List<Color> gradientColors2 = [
+    Color(0xFFB69DF8),
+    Color(0xFF6750A4),
+    Color(0xFF9A82DB),
+  ];
 
-    // Draw various sized circles for the bubble effect
-    canvas.drawCircle(
-      Offset(size.width * 0.15, size.height * 0.2),
-      size.width * 0.08,
-      circlePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.4, size.height * 0.3),
-      size.width * 0.05,
-      circlePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.75, size.height * 0.15),
-      size.width * 0.1,
-      circlePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.8, size.height * 0.4),
-      size.width * 0.06,
-      circlePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.2, size.height * 0.5),
-      size.width * 0.04,
-      circlePaint,
-    );
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat(reverse: true);
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-
-class LoginView extends StatelessWidget {
-  
-  
-  LoginView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    if (screenWidth <= 720) {
-      return smallScreenLayout();
-    } else {
-      return LargeScreenLayout();
-    }
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
-}
-
-
-
-class smallScreenLayout extends StatelessWidget {
-  final LoginController controller = Get.put(LoginController());
-  smallScreenLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Get.back(),
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          // Background wave pattern
-          Positioned.fill(
-            child: CustomPaint(
-              painter: WavePatternPainter(),
+    return AnimatedBuilder(
+      animation: _animation,
+builder: (context, child) {
+      return SizedBox( 
+        height: MediaQuery.of(context).size.height,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: List.generate(
+                3,
+                (i) => Color.lerp(
+                  gradientColors1[i],
+                  gradientColors2[i],
+                  _animation.value,
+                )!,
+              ),
             ),
           ),
+        )
+        );
+      },
+    );
+  }
+}
+
+// --- LoginView ---
+class LoginView extends StatelessWidget {
+  const LoginView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth <= 900) {
+          return const SmallScreenLogin();
+        } else {
+          return const LargeScreenLogin();
+        }
+      },
+    );
+  }
+}
+
+// --- Small Screen Layout ---
+class SmallScreenLogin extends StatelessWidget {
+  const SmallScreenLogin({super.key});
+
+  static const Color primaryColor = Color(0xFF6750A4);
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(LoginController());
+    return Scaffold(
+      backgroundColor: primaryColor,
+      body: Stack(
+        children: [
+          const Positioned.fill(child: AnimatedGradientBackground()),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      // IconButton(
-                      //   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      //   onPressed: () => Get.to(WelcomeScreen()),
-                      // ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    'Welcome\nBack',
-                    style: TextStyle(
-                      color: Colors.white,
-                        fontSize: 28,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Get.back(),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'Welcome\nBack',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 34,
                         fontFamily: 'Roboto',
-                        fontWeight: FontWeight.bold
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.18),
+                            blurRadius: 8,
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 48),
-                    TextField(
-                    controller: controller.idNumberController,
-                    decoration: InputDecoration(
-                      hintText: 'ID',
-                      hintStyle: const TextStyle(color: Colors.black45),
-                        prefixIcon: const Icon(Icons.perm_identity, color: Colors.blue),
-                      suffixIcon: Obx(() => controller.doctorId.value.isNotEmpty
-                        ? const Icon(Icons.check_circle, color: Colors.green)
-                        : const SizedBox()),
-                    ),
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.black),
-                    ),
-                  const SizedBox(height: 16),
-                  Obx(() => TextField(
-                    controller: controller.passwordController,
-                    decoration: InputDecoration(
-                      hintText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline, color: Colors.blue),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          controller.obSecurePassword.value 
-                              ? Icons.visibility_off 
-                              : Icons.visibility,
-                          color: Colors.grey,
+                    const SizedBox(height: 48),
+                    Obx(
+                      () => TextField(
+                        controller: controller.idNumberController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.93),
+                          hintText: 'ID',
+                          prefixIcon: const Icon(Icons.perm_identity, color: primaryColor),
+                          suffixIcon: controller.doctorId.value.isNotEmpty
+                              ? const Icon(Icons.check_circle, color: Colors.green)
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 18, horizontal: 18),
                         ),
-                        onPressed: controller.togglePasswordVisibility,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
-                    style: TextStyle(color: Colors.black),
-                    obscureText: controller.obSecurePassword.value,
-                  )),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Forgot password?',
-                        style: TextStyle(color: Colors.white),
+                    const SizedBox(height: 22),
+                    Obx(
+                      () => TextField(
+                        controller: controller.passwordController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.93),
+                          hintText: 'Password',
+                          hintStyle: const TextStyle(color: Colors.black45),
+                          prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              controller.obSecurePassword.value
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey,
+                            ),
+                            onPressed: controller.togglePasswordVisibility,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 18, horizontal: 18),
+                        ),
+                        style: const TextStyle(color: Colors.black),
+                        obscureText: controller.obSecurePassword.value,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'Forgot password?',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    AnimatedLoginButton(
                       onPressed: controller.login,
-                      child: const Text('Log in'),
+                      text: 'Log in',
+                      color: primaryColor,
                     ),
-                  ),
-                  const Spacer(),
-                  Center(
-                    child: TextButton(
-                      onPressed: () => Get.toNamed('/signup'),
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(color: Colors.white),
+                    const SizedBox(height: 24),
+                    Center(
+                      child: TextButton(
+                        onPressed: () => Get.toNamed('/signup'),
+                        child: const Text(
+                          'Sign up',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
           ),
@@ -204,134 +226,267 @@ class smallScreenLayout extends StatelessWidget {
   }
 }
 
-class LargeScreenLayout extends StatelessWidget {
-  final LoginController controller = Get.put(LoginController());
-  LargeScreenLayout({super.key});
+// --- Large Screen Layout ---
+class LargeScreenLogin extends StatelessWidget {
+  const LargeScreenLogin({super.key});
+
+  static const Color primaryColor = Color(0xFF6750A4);
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LoginController());
     return Scaffold(
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          Expanded(flex: 2.toInt(),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 36, horizontal: 36),
-            decoration: BoxDecoration(
-            color: Colors.blue[600],
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black,
-                offset: Offset(5, 5), // Adjust this for shadow positioning
-                blurRadius: 4.0,
-                spreadRadius: 1.0,
+          // Left animated gradient panel
+          Expanded(
+            flex: 2,
+            child: Stack(
+              children: [
+                const Positioned.fill(child: AnimatedGradientBackground()),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 48),
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    'PhysioConnect',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                      letterSpacing: 1.2,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.18),
+                          blurRadius: 8,
+                          offset: const Offset(2, 2),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: Align(
-              alignment: Alignment.topLeft,
-               child: Text(
-                'PhysioConnect',
-                 style: TextStyle(
-                  color: Colors.white,
-                   fontWeight: FontWeight.bold,
-                   fontSize: 18
-                   ),
+          ),
+          // Right login form
+          Expanded(
+            flex: 3,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 32),
+                  child: Material(
+                    elevation: 14,
+                    borderRadius: BorderRadius.circular(24),
+                    color: Colors.white.withOpacity(0.98),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Welcome Back',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          Obx(
+                            () => TextField(
+                              controller: controller.idNumberController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.deepPurple[50],
+                                hintText: 'ID',
+                                hintStyle: const TextStyle(color: Colors.black45),
+                                prefixIcon: const Icon(Icons.perm_identity, color: primaryColor),
+                                suffixIcon: controller.doctorId.value.isNotEmpty
+                                    ? const Icon(Icons.check_circle, color: Colors.green)
+                                    : null,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 18, horizontal: 18),
+                              ),
+                              keyboardType: TextInputType.number,
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          Obx(
+                            () => TextField(
+                              controller: controller.passwordController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.deepPurple[50],
+                                hintText: 'Password',
+                                hintStyle: const TextStyle(color: Colors.black45),
+                                prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    controller.obSecurePassword.value
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: controller.togglePasswordVisibility,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 18, horizontal: 18),
+                              ),
+                              style: const TextStyle(color: Colors.black),
+                              obscureText: controller.obSecurePassword.value,
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {},
+                              child: const Text(
+                                'Forgot password?',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          AnimatedLoginButton(
+                            onPressed: controller.login,
+                            text: 'Log in',
+                            color: primaryColor,
+                          ),
+                          const SizedBox(height: 24),
+                          Center(
+                            child: TextButton(
+                              onPressed: () => Get.toNamed('/signup'),
+                              child: const Text(
+                                'Sign up',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
-          ),
-          ),
-          Expanded(flex: 3.toInt(),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 76, horizontal: 200),
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('Login', style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(height: 40,),
-                Align(
-                  alignment: Alignment.center,
-                  child:SizedBox(
-                    width: 450,
-                    child: TextField(
-                    controller: controller.idNumberController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blue)
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blue)
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blue)
-                      ),
-                      hintText: 'ID',
-                      hintStyle: const TextStyle(color: Colors.black45),
-                        prefixIcon: const Icon(Icons.perm_identity, color: Colors.blue),
-                      suffixIcon: Obx(() => controller.doctorId.value.isNotEmpty
-                        ? const Icon(Icons.check_circle, color: Colors.green)
-                        : const SizedBox()),
-                    ),
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.black),
-                    ),
-                 ),
-                ),
-                SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.center,
-                  child:SizedBox(
-                    width: 450,
-                    child: TextField(
-                    controller: controller.passwordController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blue)
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blue)
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.blue)
-                      ),
-                      hintText: 'Password',
-                      hintStyle: const TextStyle(color: Colors.black45),
-                        prefixIcon: const Icon(Icons.key, color: Colors.blue),
-                      suffixIcon: Obx(() => controller.doctorId.value.isNotEmpty
-                        ? const Icon(Icons.check_circle, color: Colors.green)
-                        : const SizedBox()),
-                    ),
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.black),
-                    ),
-                 ),
-                ),
-                SizedBox(height: 35),
-                Align(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    width: 250,
-                    child: ElevatedButton(onPressed: (){}, child: Text('Submit'), style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[600]),),
-                  ),
-                )
-              ],
             ),
           ),
-          ),
-          
         ],
+      ),
+    );
+  }
+}
+
+// --- Animated Login Button ---
+class AnimatedLoginButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final String text;
+  final Color color;
+
+  const AnimatedLoginButton({
+    super.key,
+    required this.onPressed,
+    required this.text,
+    required this.color,
+  });
+
+  @override
+  State<AnimatedLoginButton> createState() => _AnimatedLoginButtonState();
+}
+
+class _AnimatedLoginButtonState extends State<AnimatedLoginButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+      lowerBound: 0.0,
+      upperBound: 0.08,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _controller.reverse();
+    widget.onPressed();
+  }
+
+  void _onTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: widget.onPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.color,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 8,
+                  shadowColor: widget.color.withOpacity(0.28),
+                ),
+                child: Text(
+                  widget.text,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    letterSpacing: 1.1,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

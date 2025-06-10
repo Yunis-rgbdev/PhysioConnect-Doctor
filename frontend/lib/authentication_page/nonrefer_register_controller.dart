@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:http/http.dart' as http;
 
-class NonreferRegisterController extends GetxController{
+class NonReferRegisterController extends GetxController{
   final TextEditingController idController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phonenumberController = TextEditingController();
